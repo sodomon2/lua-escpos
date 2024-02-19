@@ -81,17 +81,17 @@ function escpos:three_columns(col1, col2, col3)
   return centered_string
 end
 
--- @TODO: This only works in 5.1 (To be corrected).
-function escpos:intLowHigh(input, length)
+-- Generate two characters for a number
+function intLowHigh(input, length)
   outp = ""
   for i = 0, length, 1 do
     if i >= length then
       break
     end
     outp = table.concat({
-      outp, string.char(input % 256)
+      outp, string.char(math.floor(input % 256))
     }, '')
-    input = tonumber(input / 256)
+    input = math.floor(input / 256)
   end
   return outp
 end
