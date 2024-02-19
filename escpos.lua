@@ -43,6 +43,15 @@ escpos.MODE_DOUBLE_HEIGHT = 16
 escpos.MODE_DOUBLE_WIDTH  = 32
 escpos.MODE_UNDERLINE     = 128
 
+escpos.QR_ERR_CO_LEVEL_L  = 0
+escpos.QR_ERR_CO_LEVEL_M  = 1
+escpos.QR_ERR_CO_LEVEL_Q  = 2
+escpos.QR_ERR_CO_LEVEL_H  = 3
+
+escpos.QR_MODEL_1         = 1 -- Indicates QR model 1
+escpos.QR_MODEL_2         = 2 -- Indicates QR model 2
+escpos.QR_MICRO           = 3 -- Indicates QR model 3(micro)
+
 
 -- Aligns two columns from 2 strings.
 -- col1 = string left
@@ -94,6 +103,12 @@ function intLowHigh(input, length)
     input = math.floor(input / 256)
   end
   return outp
+end
+
+function wrapperSend2dCodeData(fn, cn, data, m)
+    local data, m = data, m or ''
+    header = intLowHigh(string.len(data) + string.len(m) + 2, 2)
+    io.stdout:write(GS .. "(k" .. header .. cn .. fn .. m .. data)
 end
 
 -- Defines the space between lines.
@@ -252,5 +267,24 @@ end
 function escpos:text(text)
   io.stdout:write(text .. "\n")
 end
+
+-- Print the given data as a QR code on the printer.
+-- content = the content of the code
+-- err_co  = QR error-correction level to use
+-- size    = Pixel size to use. must be from 1 to 16 (default 3).
+-- model   = Define the QR code model to use.
+function escpos:print_qrcode(content, err_co, size, model)
+  local err_co = err_co or escpos.QR_ERR_CO_LEVEL_L
+  local size   = size or 3
+  local model  = model or escpos.QR_MODEL_2
+
+  cn = '1'
+  wrapperSend2dCodeData(string.char(65), cn, string.char(48 + model) .. string.char(0))
+  wrapperSend2dCodeData(string.char(67), cn, string.char(size))
+  wrapperSend2dCodeData(string.char(69), cn, string.char(48 + err_co))
+  wrapperSend2dCodeData(string.char(80), cn, content, '0')
+  wrapperSend2dCodeData(string.char(81), cn, '', '0')
+end
+
 
 return escpos
