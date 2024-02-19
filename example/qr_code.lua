@@ -42,10 +42,10 @@ end
 -- Demo of error correction
 title("Error correction")
 err_co = {
-  ["QR_ECLEVEL_L"]  = escpos.QR_ERR_CO_LEVEL_L,
-  ["QR_ECLEVEL_M"]  = escpos.QR_ERR_CO_LEVEL_M,
-  ["QR_ECLEVEL_Q"]  = escpos.QR_ERR_CO_LEVEL_Q,
-  ["QR_ECLEVEL_H"]  = escpos.QR_ERR_CO_LEVEL_H
+  ["L"]  = escpos.QR_ERR_CO_LEVEL_L,
+  ["M"]  = escpos.QR_ERR_CO_LEVEL_M,
+  ["Q"]  = escpos.QR_ERR_CO_LEVEL_Q,
+  ["H"]  = escpos.QR_ERR_CO_LEVEL_H
 }
 
 for name, ec in pairs(err_co) do
