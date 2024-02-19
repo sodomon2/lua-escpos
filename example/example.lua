@@ -1,5 +1,6 @@
 local escpos = require("escpos")
 
+
 math.randomseed(os.time())
 local date = os.date("%d/%m/%Y")
 local hour = os.date("%H:%M")
@@ -14,9 +15,11 @@ local items = {
 }
 
 local total = 0
-escpos.width = 32
+escpos.width = 30
 local line_one = string.rep("=", escpos.width)
 local line_two = string.rep("-", escpos.width)
+
+escpos:connector("/dev/usb/lp0")
 
 escpos:setJustification(escpos.JUSTIFY_CENTER)
 escpos:feed(1)
@@ -58,3 +61,4 @@ escpos:setBarcodeWidth(2)
 escpos:setBarcodeTextPosition(escpos.BARCODE_TEXT_NONE)
 escpos:barcode("code128", "Approved")
 escpos:feed(3)
+escpos:close()

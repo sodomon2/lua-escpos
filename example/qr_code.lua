@@ -1,7 +1,8 @@
 -- Port of https://github.com/mike42/escpos-php/blob/development/example/qr-code.php
-local escpos = require("escpos")
+local escpos  = require("escpos")
+local testStr = "Testing 123"
 
-testStr = "Testing 123"
+escpos:connector("/dev/usb/lp0")
 
 function title(str)
   escpos:selectPrintMode(escpos.MODE_DOUBLE_HEIGHT | escpos.MODE_DOUBLE_WIDTH)
@@ -12,10 +13,10 @@ end
 
 -- Most simple example
 escpos:setJustification(escpos.JUSTIFY_LEFT)
-title("QR code demo");
+title("QR code demo")
 escpos:print_qrcode(testStr)
 escpos:set_text_size(1,1)
-escpos:text("Most simple example");
+escpos:text("Most simple example")
 escpos:feed(1)
 
 -- Demo that alignment is the same as text
@@ -55,7 +56,7 @@ for name, ec in pairs(err_co) do
 end
 
 -- Change size
-title("Pixel size");
+title("Pixel size")
 sizes  = {
   [1]  = "(minimum)",
   [2]  = "",
@@ -85,3 +86,4 @@ for name, model in pairs(models) do
   escpos:text(name)
   escpos:feed(2)
 end
+escpos:close()

@@ -27,7 +27,7 @@ local EOT   = "\x04"	 -- ASCII end of transmission control character
 COLOR_1 = 0 -- Use the first color (usually black)
 COLOR_2 = 1 -- Use the second color (usually red or blue)
 
-escpos.width              = ''
+escpos.width              = 32
 escpos.BARCODE_TEXT_NONE  = 0
 escpos.BARCODE_TEXT_ABOVE = 1
 escpos.BARCODE_TEXT_BELOW = 2
@@ -52,6 +52,21 @@ escpos.QR_MODEL_1         = 1 -- Indicates QR model 1
 escpos.QR_MODEL_2         = 2 -- Indicates QR model 2
 escpos.QR_MICRO           = 3 -- Indicates QR model 3(micro)
 
+local printer
+
+-- Open the printer device
+function escpos:connector(device)
+  self.printer, err = io.open(device, "wb")
+	if err then
+		return false, err
+	end
+  return true
+end
+
+-- Close Printer device
+function escpos:close()
+  self.printer:close()
+end
 
 -- Aligns two columns from 2 strings.
 -- col1 = string left
@@ -91,7 +106,7 @@ function escpos:three_columns(col1, col2, col3)
 end
 
 -- Generate two characters for a number
-function intLowHigh(input, length)
+local function intLowHigh(input, length)
   outp = ""
   for i = 0, length, 1 do
     if i >= length then
@@ -105,27 +120,27 @@ function intLowHigh(input, length)
   return outp
 end
 
-function wrapperSend2dCodeData(fn, cn, data, m)
+local function wrapperSend2dCodeData(fn, cn, data, m)
     local data, m = data, m or ''
     header = intLowHigh(string.len(data) + string.len(m) + 2, 2)
-    io.stdout:write(GS .. "(k" .. header .. cn .. fn .. m .. data)
+    escpos.printer:write(GS .. "(k" .. header .. cn .. fn .. m .. data)
 end
 
 -- Defines the space between lines.
 -- height = integer
 function escpos:set_line_spacing(height)
   if height == nil then
-    io.stdout:write(ESC .. "2");
+    self.printer:write(ESC .. "2");
   end
-  io.stdout:write(ESC .. "3" .. string.char(height));
+  self.printer:write(ESC .. "3" .. string.char(height));
 end
 
 function escpos:setPrintLeftMargin(margin)
-  io.stdout:write(GS .. 'L' .. intLowHigh(margin, 2));
+  self.printer:write(GS .. 'L' .. intLowHigh(margin, 2));
 end
 
 function escpos:setPrintWidth(width)
-  io.stdout:write(GS .. 'W' .. intLowHigh(width, 2));
+  self.printer:write(GS .. 'W' .. intLowHigh(self.width, 2));
 end
 
 -- Defines the type of print mode.
@@ -137,7 +152,7 @@ end
 --  MODE_DOUBLE_WIDTH
 --  MODE_UNDERLINE
 function escpos:selectPrintMode(mode)
-	io.stdout:write(ESC .. "!" .. string.char(mode))
+	self.printer:write(ESC .. "!" .. string.char(mode))
 end
 
 -- Defines the color to use (only if the printer supports color).
@@ -145,7 +160,7 @@ end
 --  COLOR_1
 --  COLOR_2
 function escpos:set_color(color)
-  io.stdout: write(ESC .. "r" .. string.char(color))
+  self.printer:write(ESC .. "r" .. string.char(color))
 end
 
 -- Define the text size.
@@ -153,19 +168,19 @@ end
 -- height = integer
 function escpos:set_text_size(widthMultiplier, heightMultiplier)
   local c = math.pow(2, 4) * (widthMultiplier - 1) + (heightMultiplier - 1)
-  io.stdout:write(ESC .. "!" .. string.char(c))
+  self.printer:write(ESC .. "!" .. string.char(c))
 end
 
 -- Defines the height of the barcode.
 -- height = integer
 function escpos:setBarcodeHeight(height)
-  io.stdout:write(GS .. "h" .. string.char(height))
+  self.printer:write(GS .. "h" .. string.char(height))
 end
 
 -- Defines the width of the barcode.
 -- width = integer
 function escpos:setBarcodeWidth(width)
-  io.stdout:write(GS .. "w" .. string.char(width))
+  self.printer:write(GS .. "w" .. string.char(width))
 end
 
 -- Defines the position of the barcode content.
@@ -173,7 +188,7 @@ end
 -- BARCODE_TEXT_ABOVE = 1 shows text at the top of the page
 -- BARCODE_TEXT_BELOW = 2 displays text at the bottom
 function escpos:setBarcodeTextPosition(position)
-  io.stdout:write(GS .. "H" .. string.char(position))
+  self.printer:write(GS .. "H" .. string.char(position))
 end
 
 -- Creation of the barcode.
@@ -224,7 +239,7 @@ function escpos:barcode(_type, str)
   -- io.stdout:write(GS .. "k" .. string.char(code - 65) .. srt .. NUL)
   local result, code = validate[_type](str)
   if result == str then
-    io.stdout:write(('%sk%c%c%s'):format(
+    self.printer:write(('%sk%c%c%s'):format(
       GS, code, (str):len(), str
     ))
   else
@@ -237,7 +252,7 @@ end
 -- on = true(activate) or false(deactivate)
 function escpos:setEmphasis(on)
   local r = (on==true) and string.char(1) or string.char(0)
-  io.stdout:write(ESC .. "E".. r)
+  self.printer:write(ESC .. "E".. r)
 end
 
 -- Define the type of justification to use.
@@ -246,7 +261,7 @@ end
 --  JUSTIFY_CENTER     = 1
 --  JUSTIFY_RIGHT      = 2
 function escpos:setJustification(justification)
-  io.stdout:write(ESC .. "a" .. string.char(justification))
+  self.printer:write(ESC .. "a" .. string.char(justification))
 end
 
 -- Define what type of font to use.
@@ -255,17 +270,17 @@ end
 --  FONT_B = 1
 --  FONT_C = 2
 function escpos:setFont(font)
-  io.stdout:write(ESC .. "M" .. string.char(font))
+  self.printer:write(ESC .. "M" .. string.char(font))
 end
 
 -- Send a feed.
 function escpos:feed(nl)
-  io.stdout:write(ESC .. "d" .. string.char(nl))
+  self.printer:write(ESC .. "d" .. string.char(nl))
 end
 
 -- Send a text with line break.
 function escpos:text(text)
-  io.stdout:write(text .. "\n")
+  self.printer:write(text .. "\n")
 end
 
 -- Print the given data as a QR code on the printer.
