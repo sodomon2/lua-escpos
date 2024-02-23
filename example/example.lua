@@ -19,8 +19,8 @@ escpos.width = 30
 local line_one = string.rep("=", escpos.width)
 local line_two = string.rep("-", escpos.width)
 
-escpos:connector("/dev/usb/lp0")
-
+escpos:connector_type("linux")
+device:connector("/dev/usb/lp0") -- type linux or network
 escpos:setJustification(escpos.JUSTIFY_CENTER)
 escpos:feed(1)
 escpos:text("TITLE")
@@ -60,5 +60,5 @@ escpos:setBarcodeHeight(40)
 escpos:setBarcodeWidth(2)
 escpos:setBarcodeTextPosition(escpos.BARCODE_TEXT_NONE)
 escpos:barcode("code128", "Approved")
-escpos:feed(3)
-escpos:close()
+escpos:feed(2)
+device:close()

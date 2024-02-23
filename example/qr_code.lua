@@ -2,7 +2,8 @@
 local escpos  = require("escpos")
 local testStr = "Testing 123"
 
-escpos:connector("/dev/usb/lp0")
+escpos:connector_type("linux") -- type linux or network
+device:connector("/dev/usb/lp0")
 
 function title(str)
   escpos:selectPrintMode(escpos.MODE_DOUBLE_HEIGHT | escpos.MODE_DOUBLE_WIDTH)
@@ -86,4 +87,4 @@ for name, model in pairs(models) do
   escpos:text(name)
   escpos:feed(2)
 end
-escpos:close()
+device:close()

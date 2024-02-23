@@ -8,10 +8,11 @@ lua library for printing to ESC/POS-compatible thermal printers based on https:/
 local escpos = require("escpos")
 
 escpos:connector_type(type) -- linux or network
-escpos:connector(device_connector)
+device:connector(device_connector)
 
 escpos:text("Hello World!! from lua")
 escpos:feed(2)
+device:close()
 ```
 
 # Dependencies
