@@ -305,5 +305,8 @@ function escpos:print_qrcode(content, err_co, size, model)
   wrapperSend2dCodeData(string.char(81), cn, '', '0')
 end
 
+function escpos:cut(text)
+  escpos:write(GS .. "V" .. string.char(65) .. string.char(3));
+end
 
 return escpos
