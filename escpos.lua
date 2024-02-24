@@ -52,6 +52,8 @@ escpos.QR_MODEL_1         = 1 -- Indicates QR model 1
 escpos.QR_MODEL_2         = 2 -- Indicates QR model 2
 escpos.QR_MICRO           = 3 -- Indicates QR model 3(micro)
 
+escpos.CUT_FULL           = 65
+escpos.CUT_PARTIAL        = 66
 
 -- Define the connector for devices
 -- linux or network
@@ -296,8 +298,13 @@ function escpos:print_qrcode(content, err_co, size, model)
   wrapperSend2dCodeData(string.char(81), cn, '', '0')
 end
 
-function escpos:cut(text)
-  device:write(GS .. "V" .. string.char(65) .. string.char(3));
+-- Cut the paper.
+-- mode = escpos.CUT_FULL(default) or escpos.CUT_PARTIAL
+-- lines = integer (default 3)
+function escpos:cut(mode, lines)
+  local mode = mode or escpos.CUT_FULL
+  local lines = lines or 3
+  device:write(GS .. "V" .. string.char(mode) .. string.char(lines));
 end
 
 return escpos
