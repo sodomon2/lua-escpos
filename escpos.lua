@@ -24,36 +24,36 @@ local GS    = "\x1d"	 -- ASCII group separator control character
 local DLE   = "\x10"	 -- ASCII data link escape control character
 local EOT   = "\x04"	 -- ASCII end of transmission control character
 
-COLOR_1 = 0 -- Use the first color (usually black)
-COLOR_2 = 1 -- Use the second color (usually red or blue)
+escpos.COLOR_1            = 0   -- Use the first color (usually black)
+escpos.COLOR_2            = 1   -- Use the second color (usually red or blue)
 
-escpos.width              = 32
-escpos.BARCODE_TEXT_NONE  = 0
-escpos.BARCODE_TEXT_ABOVE = 1
-escpos.BARCODE_TEXT_BELOW = 2
+escpos.width              = 32  -- Width of paper (default 32, ticket)
+escpos.BARCODE_TEXT_NONE  = 0   -- does not show the barcode text
+escpos.BARCODE_TEXT_ABOVE = 1   -- shows barcode text at the top of the page
+escpos.BARCODE_TEXT_BELOW = 2   -- displays barcode text at the bottom
 
-escpos.JUSTIFY_LEFT       = 0
-escpos.JUSTIFY_CENTER     = 1
-escpos.JUSTIFY_RIGHT      = 2
+escpos.JUSTIFY_LEFT       = 0   -- Justify content to left (default)
+escpos.JUSTIFY_CENTER     = 1   -- Justify content to center
+escpos.JUSTIFY_RIGHT      = 2   -- Justify content to right
 
-escpos.MODE_FONT_A        = 0
-escpos.MODE_FONT_B        = 1
-escpos.MODE_EMPHASIZED    = 8
-escpos.MODE_DOUBLE_HEIGHT = 16
-escpos.MODE_DOUBLE_WIDTH  = 32
-escpos.MODE_UNDERLINE     = 128
+escpos.MODE_FONT_A        = 0   -- Use Font A
+escpos.MODE_FONT_B        = 1   -- Use Font B
+escpos.MODE_EMPHASIZED    = 8   -- Use text emphasis
+escpos.MODE_DOUBLE_HEIGHT = 16  -- Use double height text
+escpos.MODE_DOUBLE_WIDTH  = 32  -- Use double width text
+escpos.MODE_UNDERLINE     = 128 -- User Underline text
 
-escpos.QR_ERR_CO_LEVEL_L  = 0
-escpos.QR_ERR_CO_LEVEL_M  = 1
-escpos.QR_ERR_CO_LEVEL_Q  = 2
-escpos.QR_ERR_CO_LEVEL_H  = 3
+escpos.QR_ERR_CO_LEVEL_L  = 0   -- QR Code error code level L
+escpos.QR_ERR_CO_LEVEL_M  = 1   -- QR Code error code level M
+escpos.QR_ERR_CO_LEVEL_Q  = 2   -- QR Code error code level Q
+escpos.QR_ERR_CO_LEVEL_H  = 3   -- QR Code error code level H
 
-escpos.QR_MODEL_1         = 1 -- Indicates QR model 1
-escpos.QR_MODEL_2         = 2 -- Indicates QR model 2
-escpos.QR_MICRO           = 3 -- Indicates QR model 3(micro)
+escpos.QR_MODEL_1         = 1   -- Indicates QR model 1
+escpos.QR_MODEL_2         = 2   -- Indicates QR model 2
+escpos.QR_MICRO           = 3   -- Indicates QR model 3(micro)
 
-escpos.CUT_FULL           = 65
-escpos.CUT_PARTIAL        = 66
+escpos.CUT_FULL           = 65  -- Complete paper cut
+escpos.CUT_PARTIAL        = 66  -- Partial paper cut
 
 -- Define the connector for devices
 -- linux or network
