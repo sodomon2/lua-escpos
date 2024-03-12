@@ -1,14 +1,12 @@
 #!/usr/bin/lua5.4
 
---[[
-
-  escpos.lua - LUA library for printing to ESC/POS-compatible thermal printers.
-
-  Copyright (c) 2024, Díaz Devera Víctor <mastervitronic@gmail.com>
-  Copyright (c) 2024, Díaz Urbaneja Víctor Diego Alejandro <sodomon2@gmail.com>
-
---]]
-
+--[[--
+ LUA library for printing to ESC/POS-compatible thermal printers.
+ @module escpos
+ @author Sodomon <sodomon2@gmail.com>, Máster Vitronic <mastervitronic@gmail.com>
+ @license MIT
+ @copyright 2024
+]]
 
 local escpos = {}
 
@@ -55,8 +53,9 @@ escpos.QR_MICRO           = 3   -- Indicates QR model 3(micro)
 escpos.CUT_FULL           = 65  -- Complete paper cut
 escpos.CUT_PARTIAL        = 66  -- Partial paper cut
 
--- Define the connector for devices
--- linux or network
+--- Define the connector for devices
+-- @param types linux or network
+-- @usage escpos:connector_type("linux")
 function escpos:connector_type(types)
   if types == "linux" then
     device = require("connectors.linux")
@@ -65,9 +64,10 @@ function escpos:connector_type(types)
   end
 end
 
--- Aligns two columns from 2 strings.
--- col1 = string left
--- col2 = string right
+--- Aligns two columns from 2 strings.
+-- @param col1 string
+-- @param col2 string
+-- @usage escpos:two_columns("TITLE", "SUBTITLE")
 function escpos:two_columns(col1, col2)
   local args= {col1, col2}
   local result = ''
@@ -84,10 +84,11 @@ function escpos:two_columns(col1, col2)
   return result, #result
 end
 
--- Aligns three columns from 3 strings.
--- col1 = string left
--- col2 = string center
--- col2 = string right
+--- Aligns three columns from 3 strings.
+-- @param col1 string
+-- @param col2 string
+-- @param col3 string
+-- @usage escpos:three_columns("TITLE", "SUBTITLE", "COMMENT")
 function escpos:three_columns(col1, col2, col3)
   -- Calcular longitud total de los strings sin espacios
   local total_length = string.len(col1) + string.len(col2) + string.len(col3)
@@ -123,8 +124,9 @@ local function wrapperSend2dCodeData(fn, cn, data, m)
   device:write(GS .. "(k" .. header .. cn .. fn .. m .. data)
 end
 
--- Defines the space between lines.
--- height = integer
+--- Defines the space between lines.
+-- @int height integer
+-- @usage escpos:set_line_spacing(4)
 function escpos:set_line_spacing(height)
   if height == nil then
     device:write(ESC .. "2");
@@ -140,68 +142,78 @@ function escpos:setPrintWidth(width)
   device:write(GS .. 'W' .. intLowHigh(self.width, 2));
 end
 
--- Defines the type of print mode.
--- Modes:
---  MODE_FONT_A
---  MODE_FONT_B
---  MODE_EMPHASIZED
---  MODE_DOUBLE_HEIGHT
---  MODE_DOUBLE_WIDTH
---  MODE_UNDERLINE
+--[[--
+  Defines the type of print mode.
+  @param mode modes available for use:
+    escpos.MODE_FONT_A
+    escpos.MODE_FONT_B
+    escpos.MODE_EMPHASIZED
+    escpos.MODE_DOUBLE_HEIGHT
+    escpos.MODE_DOUBLE_WIDTH
+    escpos.MODE_UNDERLINE
+
+  @usage escpos:selectPrintMode(escpos.MODE_UNDERLINE)
+]]
 function escpos:selectPrintMode(mode)
   device:write(ESC .. "!" .. string.char(mode))
 end
 
--- Defines the color to use (only if the printer supports color).
--- Colors:
---  COLOR_1
---  COLOR_2
+--[[--
+  Defines the color to use (only if the printer supports color).
+  @param color Valid colors:
+    escpos.COLOR_1
+    escpos.COLOR_2
+
+  @usage escpos:set_color(escpos.COLOR_2)
+]]
 function escpos:set_color(color)
   device:write(ESC .. "r" .. string.char(color))
 end
 
--- Define the text size.
--- width  = integer
--- height = integer
+--- Define the text size.
+-- @int widthMultiplier
+-- @int heightMultiplier
+-- @usage escpos:set_text_size(3, 3)
 function escpos:set_text_size(widthMultiplier, heightMultiplier)
   local c = math.pow(2, 4) * (widthMultiplier - 1) + (heightMultiplier - 1)
   device:write(ESC .. "!" .. string.char(c))
 end
 
--- Defines the height of the barcode.
--- height = integer
+--- Defines the height of the barcode.
+-- @int height
+-- @usage escpos:setBarcodeHeight(4)
 function escpos:setBarcodeHeight(height)
   device:write(GS .. "h" .. string.char(height))
 end
 
--- Defines the width of the barcode.
--- width = integer
+--- Defines the width of the barcode.
+-- @int width
+-- @usage escpos:setBarcodeWidth(7)
 function escpos:setBarcodeWidth(width)
   device:write(GS .. "w" .. string.char(width))
 end
 
--- Defines the position of the barcode content.
--- BARCODE_TEXT_NONE = 0 does not show the text
--- BARCODE_TEXT_ABOVE = 1 shows text at the top of the page
--- BARCODE_TEXT_BELOW = 2 displays text at the bottom
+--[[--
+  Defines the position of the barcode content.
+  @param position avaliable position:
+    escpos.BARCODE_TEXT_NONE (does not show the text)
+    escpos.BARCODE_TEXT_ABOVE (shows text at the top of the page)
+    escpos.BARCODE_TEXT_BELOW (displays text at the bottom)
+
+  @usage escpos:setBarcodeTextPosition(escpos.BARCODE_TEXT_BELOW)
+]]
 function escpos:setBarcodeTextPosition(position)
   device:write(GS .. "H" .. string.char(position))
 end
 
--- Creation of the barcode.
--- id_code = code type.
--- types of barcodes:
---    1: upca
---    2: upce
---    3: jan13
---    3: jan8
---    4: code39
---    5: ift
---    6: codabar
---    7: code93
---    8: code128
--- str = content of the barcode.
+--[[--
+  Creation of the barcode.
+  @param _type types of barcodes: upca, upce, jan13, jan8, code39, itf, codabar,
+  code93, code128
+  @string str content of the barcode
 
+  @usage escpos:barcode("code128", "HELLO WORLD!")
+]]
 function escpos:barcode(_type, str)
   local validate = {
     ['upca']   =function (str)
@@ -245,46 +257,68 @@ function escpos:barcode(_type, str)
 
 end
 
--- Defines whether Emphasis will be activated.
--- on = true(activate) or false(deactivate)
+--- Defines whether Emphasis will be activated.
+-- @bool on true(activate) or false(deactivate)
+-- @usage escpos:setEmphasis(true)
 function escpos:setEmphasis(on)
   local r = (on==true) and string.char(1) or string.char(0)
   device:write(ESC .. "E".. r)
 end
 
--- Define the type of justification to use.
--- Types of justification:
---  JUSTIFY_LEFT       = 0
---  JUSTIFY_CENTER     = 1
---  JUSTIFY_RIGHT      = 2
+--[[--
+  Define the type of justification to use.
+  @param justification Types of justification:
+    escpos.JUSTIFY_LEFT
+    escpos.JUSTIFY_CENTER
+    escpos.JUSTIFY_RIGHT
+  @usage escpos:setJustification(escpos.JUSTIFY_CENTER)
+]]
 function escpos:setJustification(justification)
   device:write(ESC .. "a" .. string.char(justification))
 end
 
--- Define what type of font to use.
--- Type of fonts:
---  FONT_A = 0
---  FONT_B = 1
---  FONT_C = 2
+--[[--
+  Define what type of font to use.
+  @param font Type of fonts:
+    escpos.FONT_A (escpos.MODE_FONT_A)
+    escpos.FONT_B (escpos.MODE_FONT_B)
+  @usage escpos:setFont(escpos.MODE_FONT_A)
+]]
 function escpos:setFont(font)
   device:write(ESC .. "M" .. string.char(font))
 end
 
--- Send a feed.
+--- Send a feed.
+-- @int nl
+-- @usage escpos:feed(2)
 function escpos:feed(nl)
   device:write(ESC .. "d" .. string.char(nl))
 end
 
--- Send a text with line break.
+--- Send a text with line break.
+-- @string text
+-- @usage escpos:text("HELLO WOLRD!!")
 function escpos:text(text)
   device:write(text .. "\n")
 end
 
--- Print the given data as a QR code on the printer.
--- content = the content of the code
--- err_co  = QR error-correction level to use
--- size    = Pixel size to use. must be from 1 to 16 (default 3).
--- model   = Define the QR code model to use.
+
+
+--[[--
+  Print the given data as a QR code on the printer.
+  @string content the content of the code
+  @param err_co QR error-correction level to use:
+    escpos.QR_ERR_CO_LEVEL_L
+    escpos.QR_ERR_CO_LEVEL_M
+    escpos.QR_ERR_CO_LEVEL_Q
+    escpos.QR_ERR_CO_LEVEL_H
+  @int size Pixel size to use. must be from 1 to 16 (default 3).
+  @param model Define the QR code model to use.
+    escpos.QR_MODEL_1
+    escpos.QR_MODEL_2
+    escpos.QR_MICRO
+  @usage escpos:print_qrcode("QR TESTING", escpos.QR_ERR_CO_LEVEL_M, 4, escpos.QR_MODEL_2)
+]]
 function escpos:print_qrcode(content, err_co, size, model)
   local err_co = err_co or escpos.QR_ERR_CO_LEVEL_L
   local size   = size or 3
@@ -298,9 +332,13 @@ function escpos:print_qrcode(content, err_co, size, model)
   wrapperSend2dCodeData(string.char(81), cn, '', '0')
 end
 
--- Cut the paper.
--- mode = escpos.CUT_FULL(default) or escpos.CUT_PARTIAL
--- lines = integer (default 3)
+--[[--
+  Cut the paper.
+  @param mode cut modes:
+    escpos.CUT_FULL (default)
+    escpos.CUT_PARTIAL
+  @int lines integer
+]]
 function escpos:cut(mode, lines)
   local mode = mode or escpos.CUT_FULL
   local lines = lines or 3

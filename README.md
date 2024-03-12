@@ -11,7 +11,7 @@ escpos:connector_type(type) -- linux or network
 device:connector(device_connector)
 
 escpos:text("Hello World!! from lua")
-escpos:feed(2)
+escpos:feed(1)
 device:close()
 ```
 
