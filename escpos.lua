@@ -65,8 +65,8 @@ function escpos:connector_type(types)
 end
 
 --- Aligns two columns from 2 strings.
--- @param col1 string
--- @param col2 string
+-- @string col1
+-- @string col2
 -- @usage escpos:two_columns("TITLE", "SUBTITLE")
 function escpos:two_columns(col1, col2)
   local args= {col1, col2}
@@ -85,9 +85,9 @@ function escpos:two_columns(col1, col2)
 end
 
 --- Aligns three columns from 3 strings.
--- @param col1 string
--- @param col2 string
--- @param col3 string
+-- @string col1
+-- @string col2
+-- @string col3
 -- @usage escpos:three_columns("TITLE", "SUBTITLE", "COMMENT")
 function escpos:three_columns(col1, col2, col3)
   -- Calcular longitud total de los strings sin espacios
@@ -125,7 +125,7 @@ local function wrapperSend2dCodeData(fn, cn, data, m)
 end
 
 --- Defines the space between lines.
--- @int height integer
+-- @int height
 -- @usage escpos:set_line_spacing(4)
 function escpos:set_line_spacing(height)
   if height == nil then
