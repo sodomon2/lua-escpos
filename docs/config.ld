@@ -6,7 +6,11 @@ dir = "docs" -- for compatibility with github pages
 format='discount'
 -- backtick_references=false
 file={
-    '../escpos.lua'
+    '../',
+    exclude = {
+        '../connectors/',
+        '../example'
+    }
 }
 readme='../README.md'
 style='!pale'

@@ -56,6 +56,7 @@ escpos.CUT_PARTIAL        = 66  -- Partial paper cut
 --- Define the connector for devices
 -- @param types linux or network
 -- @usage escpos:connector_type("linux")
+-- @see device:connector
 function escpos:connector_type(types)
   if types == "linux" then
     device = require("connectors.linux")
