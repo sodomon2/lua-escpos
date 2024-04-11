@@ -15,6 +15,16 @@ escpos:feed(1)
 device:close()
 ```
 
-# Dependencies
+## Install
+
+Install with luarocks:
+
+```
+$ luarocks install lua-escpos
+
+```
+
+
+## Dependencies
 
 - [lua-regex](https://github.com/rrthomas/lrexlib/)
