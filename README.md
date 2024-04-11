@@ -21,8 +21,17 @@ Install with luarocks:
 
 ```
 $ luarocks install lua-escpos
+```
+
+## Documentation
+See the online documentation of [lua-escpos](https://sodomon.gitlab.io/lua-escpos)
+
+To generate the documentation locally:
 
 ```
+$ ldoc -c docs/config.ld -d ../public/ -a .
+```
+the documentation will be generated in public/.
 
 
 ## Dependencies
