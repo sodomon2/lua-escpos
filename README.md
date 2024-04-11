@@ -36,4 +36,5 @@ the documentation will be generated in public/.
 
 ## Dependencies
 
-- [lua-regex](https://github.com/rrthomas/lrexlib/)
+- [lua-regex](https://github.com/rrthomas/lrexlib/) For the barcode support.
+- [luasocket](https://lunarmodules.github.io/luasocket/) For the network connector.

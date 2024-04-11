@@ -16,7 +16,8 @@ description = {
 
 dependencies = {
   "lua >= 5.1",
-  "lrexlib-pcre2"
+  "lrexlib-pcre2",
+  "luasocket",
 }
 
 build = {
