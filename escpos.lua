@@ -13,14 +13,14 @@ local escpos = {}
 -- https://github.com/rrthomas/lrexlib/
 local regex  = require("rex_pcre2")
 
-local NUL   = "\x00"	 -- ASCII null control character
-local LF    = "\x0a"	 -- ASCII linefeed control character
-local ESC   = "\x1b"   -- ASCII escape control character
-local FS    = "\x1c"	 -- ASCII form separator control character
-local FF    = "\x0c"	 -- ASCII form feed control character
-local GS    = "\x1d"	 -- ASCII group separator control character
-local DLE   = "\x10"	 -- ASCII data link escape control character
-local EOT   = "\x04"	 -- ASCII end of transmission control character
+local NUL   = string.char(0)   -- ASCII null control character
+local LF    = string.char(10)  -- ASCII linefeed control character
+local ESC   = string.char(27)  -- ASCII escape control character
+local FS    = string.char(28)  -- ASCII form separator control character
+local FF    = string.char(12)  -- ASCII form feed control character
+local GS    = string.char(29)  -- ASCII group separator control character
+local DLE   = string.char(16)  -- ASCII data link escape control character
+local EOT   = string.char(4)   -- ASCII end of transmission control character
 
 escpos.COLOR_1            = 0   -- Use the first color (usually black)
 escpos.COLOR_2            = 1   -- Use the second color (usually red or blue)
@@ -54,7 +54,7 @@ escpos.CUT_FULL           = 65  -- Complete paper cut
 escpos.CUT_PARTIAL        = 66  -- Partial paper cut
 
 --- Define the connector for devices
--- @param types linux or network
+-- @param types linux, network
 -- @usage escpos:connector_type("linux")
 -- @see device:connector
 function escpos:connector_type(types)
@@ -106,7 +106,7 @@ end
 
 -- Generate two characters for a number
 local function intLowHigh(input, length)
-  outp = ""
+  local outp = ""
   for i = 0, length, 1 do
     if i >= length then
       break
@@ -120,9 +120,9 @@ local function intLowHigh(input, length)
 end
 
 local function wrapperSend2dCodeData(fn, cn, data, m)
-  local data, m = data, m or ''
-  header = intLowHigh(string.len(data) + string.len(m) + 2, 2)
-  device:write(GS .. "(k" .. header .. cn .. fn .. m .. data)
+  local _data, _m = data, m or ''
+  local header = intLowHigh(string.len(_data) + string.len(_m) + 2, 2)
+  device:write(GS .. "(k" .. header .. cn .. fn .. _m .. _data)
 end
 
 --- Defines the space between lines.
@@ -321,14 +321,14 @@ end
   @usage escpos:print_qrcode("QR TESTING", escpos.QR_ERR_CO_LEVEL_M, 4, escpos.QR_MODEL_2)
 ]]
 function escpos:print_qrcode(content, err_co, size, model)
-  local err_co = err_co or escpos.QR_ERR_CO_LEVEL_L
-  local size   = size or 3
-  local model  = model or escpos.QR_MODEL_2
+  local _err_co = err_co or escpos.QR_ERR_CO_LEVEL_L
+  local _size   = size or 3
+  local _model  = model or escpos.QR_MODEL_2
 
-  cn = '1'
-  wrapperSend2dCodeData(string.char(65), cn, string.char(48 + model) .. string.char(0))
-  wrapperSend2dCodeData(string.char(67), cn, string.char(size))
-  wrapperSend2dCodeData(string.char(69), cn, string.char(48 + err_co))
+  local cn = '1'
+  wrapperSend2dCodeData(string.char(65), cn, string.char(48 + _model) .. string.char(0))
+  wrapperSend2dCodeData(string.char(67), cn, string.char(_size))
+  wrapperSend2dCodeData(string.char(69), cn, string.char(48 + _err_co))
   wrapperSend2dCodeData(string.char(80), cn, content, '0')
   wrapperSend2dCodeData(string.char(81), cn, '', '0')
 end
